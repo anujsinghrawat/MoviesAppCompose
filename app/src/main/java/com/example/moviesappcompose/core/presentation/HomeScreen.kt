@@ -16,7 +16,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,13 +33,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.moviesappcompose.movieList.presentation.MovieListUIEvent
 import com.example.moviesappcompose.movieList.presentation.MovieListViewModel
+import com.example.moviesappcompose.movieList.presentation.screens.PopularMovieScreen
+import com.example.moviesappcompose.movieList.presentation.screens.UpcomingMovieScreen
 import com.example.moviesappcompose.movieList.util.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
     val movieListViewModel = hiltViewModel<MovieListViewModel>()
-    val movieState = movieListViewModel.movieListState.collectAsState().value
+    val movieListState = movieListViewModel.movieListState.collectAsState().value
     val bottomNavController = rememberNavController()
 
 
@@ -51,27 +52,42 @@ fun HomeScreen(navController: NavHostController) {
     }, topBar = {
         TopAppBar(
             title = {
-                Text(text = if (movieState.isCurrentPopularScreen) "Popular Movies"
-                else "Upcoming Movies",
+                Text(
+                    text = if (movieListState.isCurrentPopularScreen) "Popular Movies"
+                    else "Upcoming Movies",
                     fontSize = 20.sp
                 )
             },
             modifier = Modifier.shadow(2.dp),
             colors = topAppBarColors(
                 MaterialTheme.colorScheme.inverseOnSurface
-        ))
+            )
+        )
     }) { paddingValues ->
-        Box(modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()){
-            NavHost(navController = bottomNavController, startDestination = Screen.PopularMovieList.rout){
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
+            NavHost(
+                navController = bottomNavController,
+                startDestination = Screen.PopularMovieList.rout
+            ) {
                 composable(Screen.PopularMovieList.rout)
                 {
-//                    PopularMovieScreen()
+                    PopularMovieScreen(
+                        navController = navController,
+                        movieListState = movieListState,
+                        onEvent = movieListViewModel::onEvent
+                    )
                 }
                 composable(Screen.UpcomingMovieList.rout)
                 {
-//                    UpcomingMovieScreen()
+                    UpcomingMovieScreen(
+                        navController = navController,
+                        movieListState = movieListState,
+                        onEvent = movieListViewModel::onEvent
+                    )
                 }
 
             }
